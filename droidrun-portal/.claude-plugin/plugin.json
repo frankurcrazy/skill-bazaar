@@ -1,0 +1,11 @@
+{
+  "name": "droidrun-portal",
+  "version": "1.0.0",
+  "description": "Control Android devices via droidrun-portal using ADB commands",
+  "author": {
+    "name": "Frank"
+  },
+  "homepage": "https://github.com/droidrun/droidrun-portal",
+  "license": "MIT",
+  "keywords": ["android", "mobile", "automation", "adb", "droidrun"]
+}
