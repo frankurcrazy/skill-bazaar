@@ -20,6 +20,7 @@ python3 scripts/droid-tap.py "Submit" --avoid-overlap  # find clear tap point
 # Tap element by index (faster, from droid-observe output)
 python3 scripts/droid-tap-index.py 5             # tap element [5]
 python3 scripts/droid-tap-index.py 5 --avoid-overlap  # avoid overlapping elements
+python3 scripts/droid-tap-index.py 5 --full      # use --full indices (matches droid-observe --full)
 
 # Type text via ContentProvider (supports Unicode)
 python3 scripts/droid-type.py "Hello World"
@@ -28,6 +29,19 @@ python3 scripts/droid-type.py "replacement" --clear  # clear field first
 # Wait for element to appear (polls every 1s)
 python3 scripts/droid-wait.py "Submit"
 python3 scripts/droid-wait.py "Loading" --timeout 30
+
+# Long-press element by text
+python3 scripts/droid-longpress.py "Settings"
+python3 scripts/droid-longpress.py "Settings" --duration 2000  # custom duration
+
+# Long-press by index
+python3 scripts/droid-longpress-index.py 5
+
+# Long-press at coordinates
+python3 scripts/droid-longpress.py --coords 540 1200
+
+# Wake screen before action (add to any script)
+python3 scripts/droid-tap.py "Submit" --ensure-awake
 
 # Multi-device: specify serial
 python3 scripts/droid-tap.py "OK" -s SERIAL

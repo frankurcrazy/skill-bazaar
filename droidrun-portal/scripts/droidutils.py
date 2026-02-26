@@ -45,6 +45,16 @@ KEYBOARD_PREFIXES = [
 # ADB Utilities
 # =============================================================================
 
+def ensure_screen_awake(serial=None):
+    """Wake screen if it's off.
+
+    Args:
+        serial: Device serial number for adb -s
+    """
+    run_adb(["shell", "input", "keyevent", "KEYCODE_WAKEUP"], serial=serial, check=False)
+    time.sleep(0.3)
+
+
 def run_adb(args, serial=None, timeout=10, check=True):
     """Run an adb command and return stdout.
 
@@ -125,27 +135,40 @@ def parse_content_provider(output, check=True):
         return None
 
 
-def query_tree_with_retry(serial=None, max_retries=MAX_RETRIES, delay=RETRY_DELAY):
+def query_tree_with_retry(serial=None, max_retries=MAX_RETRIES, delay=RETRY_DELAY, full=False):
     """Query a11y_tree with retry logic.
 
     Args:
         serial: Device serial number
         max_retries: Maximum number of attempts
         delay: Delay between retries in seconds
+        full: If True, use a11y_tree_full with state properties
 
     Returns:
-        Parsed tree, or None if all retries failed
+        Parsed tree (list), or None if all retries failed
     """
+    uri = "content://com.droidrun.portal/a11y_tree_full" if full else "content://com.droidrun.portal/a11y_tree"
+
     for attempt in range(max_retries):
         output = run_adb(
-            ["shell", "content", "query", "--uri",
-             "content://com.droidrun.portal/a11y_tree"],
+            ["shell", "content", "query", "--uri", uri],
             serial=serial,
             check=False,
         )
-        tree = parse_content_provider(output, check=False)
-        if tree:
-            return tree
+        tree_data = parse_content_provider(output, check=False)
+        if tree_data:
+            # a11y_tree_full returns a single root dict, wrap and assign indices
+            if full and isinstance(tree_data, dict):
+                tree = [tree_data]
+                counter = [1]
+                def assign_indices(nodes):
+                    for node in nodes:
+                        node["index"] = counter[0]
+                        counter[0] += 1
+                        assign_indices(node.get("children", []))
+                assign_indices(tree)
+                return tree
+            return tree_data
         if attempt < max_retries - 1:
             time.sleep(delay)
     return None
@@ -155,10 +178,38 @@ def query_tree_with_retry(serial=None, max_retries=MAX_RETRIES, delay=RETRY_DELA
 # Bounds Utilities
 # =============================================================================
 
-def parse_bounds(bounds_str):
-    """Parse bounds string 'left, top, right, bottom' into (l, t, r, b)."""
-    parts = [int(x.strip()) for x in bounds_str.split(",")]
+def parse_bounds(bounds):
+    """Parse bounds into (l, t, r, b).
+
+    Args:
+        bounds: Either a string 'left, top, right, bottom' or
+                a dict {'left': l, 'top': t, 'right': r, 'bottom': b}
+
+    Returns:
+        Tuple (left, top, right, bottom)
+    """
+    if isinstance(bounds, dict):
+        return bounds["left"], bounds["top"], bounds["right"], bounds["bottom"]
+    # String format: "left, top, right, bottom"
+    parts = [int(x.strip()) for x in bounds.split(",")]
     return parts[0], parts[1], parts[2], parts[3]
+
+
+def get_bounds(node):
+    """Get bounds from node, handling both a11y_tree and a11y_tree_full formats.
+
+    Returns:
+        Bounds in consistent format, or empty string if not found
+    """
+    # a11y_tree format: "bounds" as string
+    bounds = node.get("bounds", "")
+    if bounds:
+        return bounds
+    # a11y_tree_full format: "boundsInScreen" as dict
+    bounds_obj = node.get("boundsInScreen")
+    if bounds_obj:
+        return f"{bounds_obj['left']}, {bounds_obj['top']}, {bounds_obj['right']}, {bounds_obj['bottom']}"
+    return ""
 
 
 def center_of(bounds_str):
@@ -167,9 +218,9 @@ def center_of(bounds_str):
     return (l + r) // 2, (t + b) // 2
 
 
-def get_element_size(bounds_str):
+def get_element_size(bounds):
     """Get width and height of bounds."""
-    l, t, r, b = parse_bounds(bounds_str)
+    l, t, r, b = parse_bounds(bounds)
     return r - l, b - t
 
 
@@ -179,7 +230,7 @@ def get_element_size(bounds_str):
 
 def is_too_small(node, min_size=MIN_ELEMENT_SIZE):
     """Check if element is smaller than minimum size."""
-    bounds = node.get("bounds", "")
+    bounds = get_bounds(node)
     if not bounds:
         return False
     w, h = get_element_size(bounds)
@@ -204,7 +255,7 @@ def is_visible(node, screen_width, screen_height, threshold=VISIBILITY_THRESHOLD
     Returns:
         True if element is sufficiently visible
     """
-    bounds = node.get("bounds", "")
+    bounds = get_bounds(node)
     if not bounds:
         return True  # No bounds = assume visible
 
@@ -418,11 +469,11 @@ def get_tap_point(element, tree=None):
     Returns:
         (x, y) tuple of tap point
     """
-    bounds_str = element.get("bounds", "")
-    if not bounds_str:
+    bounds = get_bounds(element)
+    if not bounds:
         return None
 
-    l, t, r, b = parse_bounds(bounds_str)
+    l, t, r, b = parse_bounds(bounds)
     cx, cy = (l + r) // 2, (t + b) // 2
 
     # If no tree provided, just return center
@@ -479,11 +530,17 @@ def short_resource_id(resource_id):
     return resource_id.rsplit("/", 1)[-1] if "/" in resource_id else resource_id
 
 
-def format_element(node):
-    """Format element for display."""
+def format_element(node, include_state=True):
+    """Format element for display.
+
+    Args:
+        node: Element node dict
+        include_state: If True, include checked/enabled/selected state
+    """
     idx = node.get("index", "?")
-    text = node.get("text", "")
-    bounds = node.get("bounds", "")
+    # Handle both text and contentDescription for a11y_tree_full
+    text = node.get("text", "") or node.get("contentDescription", "")
+    bounds = get_bounds(node)
     class_name = short_class_name(node.get("className", ""))
     resource_id = short_resource_id(node.get("resourceId", ""))
 
@@ -498,7 +555,70 @@ def format_element(node):
     parts.append(f"class={class_name}")
     if resource_id:
         parts.append(f"id={resource_id}")
+
+    # Add state properties for interactive elements
+    if include_state:
+        states = []
+        # Check for checked state (switches, checkboxes, radio buttons)
+        # Handle both isChecked (full tree) and checked
+        is_checkable = node.get("isCheckable")
+        checked = node.get("isChecked")
+        if checked is None:
+            checked = node.get("checked")
+        if is_checkable or checked is not None:
+            if checked is not None:
+                states.append(f"checked={str(checked).lower()}")
+        # Check for enabled state
+        enabled = node.get("isEnabled")
+        if enabled is None:
+            enabled = node.get("enabled")
+        if enabled is False:
+            states.append("enabled=false")
+        # Check for selected state
+        selected = node.get("isSelected") or node.get("selected")
+        if selected:
+            states.append("selected=true")
+        # Check for focused state
+        focused = node.get("isFocused") or node.get("focused")
+        if focused:
+            states.append("focused=true")
+        if states:
+            parts.append(f"[{', '.join(states)}]")
+
     return " ".join(parts)
+
+
+def format_element_json(node):
+    """Format element as JSON-serializable dict.
+
+    Args:
+        node: Element node dict
+
+    Returns:
+        Dict with standardized element properties
+    """
+    bounds = get_bounds(node)
+    center = None
+    if bounds:
+        cx, cy = center_of(bounds)
+        center = [cx, cy]
+
+    # Handle both text and contentDescription
+    text = node.get("text", "") or node.get("contentDescription", "")
+
+    return {
+        "index": node.get("index"),
+        "text": text,
+        "className": short_class_name(node.get("className", "")),
+        "bounds": bounds,
+        "center": center,
+        "resourceId": short_resource_id(node.get("resourceId", "")),
+        "checked": node.get("isChecked") if node.get("isChecked") is not None else node.get("checked"),
+        "enabled": node.get("isEnabled") if node.get("isEnabled") is not None else node.get("enabled"),
+        "selected": node.get("isSelected") or node.get("selected"),
+        "focused": node.get("isFocused") or node.get("focused"),
+        "clickable": node.get("isClickable") or node.get("clickable"),
+    }
 
 
 # =============================================================================

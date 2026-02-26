@@ -4,7 +4,7 @@
 import argparse
 import base64
 
-from droidutils import run_adb
+from droidutils import run_adb, ensure_screen_awake
 
 
 def main():
@@ -12,7 +12,11 @@ def main():
     parser.add_argument("text", help="Text to type")
     parser.add_argument("-s", "--serial", help="Device serial number for adb -s")
     parser.add_argument("--clear", action="store_true", help="Clear the field before typing")
+    parser.add_argument("--ensure-awake", action="store_true", help="Wake screen before action")
     args = parser.parse_args()
+
+    if args.ensure_awake:
+        ensure_screen_awake(serial=args.serial)
 
     encoded = base64.b64encode(args.text.encode("utf-8")).decode("ascii")
     clear_val = "true" if args.clear else "false"

@@ -80,3 +80,9 @@ No automated tests yet. Manual testing:
 
 - [ ] `../README.md` — Update skills list in plugin details section
 - [ ] `../.claude-plugin/marketplace.json` — Update version if releasing new version
+
+**When releasing a new version:**
+
+- [ ] `.claude-plugin/plugin.json` — Bump version (e.g., 1.0.0 → 1.1.0)
+- [ ] `../.claude-plugin/marketplace.json` — Match version in plugins array
+- [ ] Commit with: `chore(droidrun-portal): bump version to X.Y.Z`

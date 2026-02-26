@@ -11,6 +11,7 @@ from droidutils import (
     center_of,
     parse_bounds,
     short_class_name,
+    ensure_screen_awake,
 )
 
 
@@ -20,7 +21,11 @@ def main():
     parser.add_argument("-s", "--serial", help="Device serial number for adb -s")
     parser.add_argument("--timeout", type=int, default=10, help="Timeout in seconds (default: 10)")
     parser.add_argument("--exact", action="store_true", help="Require exact text match")
+    parser.add_argument("--ensure-awake", action="store_true", help="Wake screen before waiting")
     args = parser.parse_args()
+
+    if args.ensure_awake:
+        ensure_screen_awake(serial=args.serial)
 
     start = time.time()
     while True:

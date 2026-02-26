@@ -10,6 +10,7 @@ from droidutils import (
     find_element,
     get_tap_point,
     short_class_name,
+    ensure_screen_awake,
 )
 
 
@@ -19,7 +20,11 @@ def main():
     parser.add_argument("-s", "--serial", help="Device serial number for adb -s")
     parser.add_argument("--exact", action="store_true", help="Require exact text match")
     parser.add_argument("--avoid-overlap", action="store_true", help="Find clear tap point avoiding overlaps")
+    parser.add_argument("--ensure-awake", action="store_true", help="Wake screen before action")
     args = parser.parse_args()
+
+    if args.ensure_awake:
+        ensure_screen_awake(serial=args.serial)
 
     output = run_adb(
         ["shell", "content", "query", "--uri",

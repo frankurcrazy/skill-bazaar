@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Tap element by index number (faster than text search)."""
+"""Long-press element by index number (faster than text search)."""
 
 import argparse
 import sys
@@ -15,10 +15,10 @@ from droidutils import (
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Tap UI element by index number")
-    parser.add_argument("index", type=int, help="Element index to tap (from droid-observe output)")
+    parser = argparse.ArgumentParser(description="Long-press UI element by index number")
+    parser.add_argument("index", type=int, help="Element index to long-press (from droid-observe output)")
     parser.add_argument("-s", "--serial", help="Device serial number for adb -s")
-    parser.add_argument("--avoid-overlap", action="store_true", help="Find clear tap point avoiding overlaps")
+    parser.add_argument("--duration", type=int, default=1500, help="Long-press duration in ms (default: 1500)")
     parser.add_argument("--ensure-awake", action="store_true", help="Wake screen before action")
     parser.add_argument("--full", action="store_true", help="Use full a11y tree (match droid-observe --full indices)")
     args = parser.parse_args()
@@ -36,8 +36,7 @@ def main():
         print(f"Error: no element found with index {args.index}", file=sys.stderr)
         sys.exit(1)
 
-    # Get tap point (with overlap avoidance if requested)
-    tap_point = get_tap_point(element, tree if args.avoid_overlap else None)
+    tap_point = get_tap_point(element)
     if not tap_point:
         print(f"Error: element has no bounds: {element}", file=sys.stderr)
         sys.exit(1)
@@ -46,10 +45,14 @@ def main():
     text = element.get("text", "") or element.get("contentDescription", "")
     class_name = short_class_name(element.get("className", ""))
 
-    run_adb(["shell", "input", "tap", str(cx), str(cy)], serial=args.serial)
+    # Long-press = swipe with same start/end coordinates
+    run_adb(
+        ["shell", "input", "swipe", str(cx), str(cy), str(cx), str(cy), str(args.duration)],
+        serial=args.serial,
+    )
 
     display_text = f'"{text}"' if text else f"index {args.index}"
-    print(f"Tapped {display_text} ({class_name}) at ({cx}, {cy})")
+    print(f"Long-pressed {display_text} ({class_name}) at ({cx}, {cy}) for {args.duration}ms")
 
 
 if __name__ == "__main__":

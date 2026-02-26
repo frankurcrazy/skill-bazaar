@@ -26,6 +26,13 @@ python3 scripts/droid-observe.py --no-filter-small      # include tiny elements 
 python3 scripts/droid-observe.py --no-filter-keyboard   # include keyboard elements
 python3 scripts/droid-observe.py --no-filter-invisible  # include off-screen elements
 
+# Get element states (checked, enabled, selected, focused):
+python3 scripts/droid-observe.py --full                 # uses a11y_tree_full
+python3 scripts/droid-observe.py --full --json          # JSON output with states
+
+# Wake screen before observing:
+python3 scripts/droid-observe.py --ensure-awake
+
 # Multi-device: specify serial
 python3 scripts/droid-observe.py -s SERIAL
 ```
