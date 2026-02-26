@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Find a UI element by text and tap it."""
+"""Tap element by index number (faster than text search)."""
 
 import argparse
 import sys
@@ -7,17 +7,16 @@ import sys
 from droidutils import (
     run_adb,
     parse_content_provider,
-    find_element,
+    find_element_by_index,
     get_tap_point,
     short_class_name,
 )
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Find UI element by text and tap it")
-    parser.add_argument("text", help="Text to search for in UI elements")
+    parser = argparse.ArgumentParser(description="Tap UI element by index number")
+    parser.add_argument("index", type=int, help="Element index to tap (from droid-observe output)")
     parser.add_argument("-s", "--serial", help="Device serial number for adb -s")
-    parser.add_argument("--exact", action="store_true", help="Require exact text match")
     parser.add_argument("--avoid-overlap", action="store_true", help="Find clear tap point avoiding overlaps")
     args = parser.parse_args()
 
@@ -28,10 +27,9 @@ def main():
     )
     tree = parse_content_provider(output)
 
-    element = find_element(tree, args.text, exact=args.exact)
+    element = find_element_by_index(tree, args.index)
     if not element:
-        match_type = "exactly matching" if args.exact else "containing"
-        print(f"Error: no element found with text {match_type} \"{args.text}\"", file=sys.stderr)
+        print(f"Error: no element found with index {args.index}", file=sys.stderr)
         sys.exit(1)
 
     # Get tap point (with overlap avoidance if requested)
@@ -45,7 +43,9 @@ def main():
     class_name = short_class_name(element.get("className", ""))
 
     run_adb(["shell", "input", "tap", str(cx), str(cy)], serial=args.serial)
-    print(f"Tapped \"{text}\" ({class_name}) at ({cx}, {cy})")
+
+    display_text = f'"{text}"' if text else f"index {args.index}"
+    print(f"Tapped {display_text} ({class_name}) at ({cx}, {cy})")
 
 
 if __name__ == "__main__":

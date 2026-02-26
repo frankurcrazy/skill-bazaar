@@ -3,31 +3,8 @@
 
 import argparse
 import base64
-import subprocess
-import sys
 
-
-def run_adb(args, serial=None):
-    cmd = ["adb"]
-    if serial:
-        cmd += ["-s", serial]
-    cmd += args
-    try:
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=10)
-    except FileNotFoundError:
-        print("Error: adb not found. Is Android SDK installed and on PATH?", file=sys.stderr)
-        sys.exit(1)
-    except subprocess.TimeoutExpired:
-        print("Error: adb command timed out", file=sys.stderr)
-        sys.exit(1)
-    if result.returncode != 0:
-        stderr = result.stderr.strip()
-        if "no devices" in stderr or "not found" in stderr:
-            print("Error: no Android device connected", file=sys.stderr)
-        else:
-            print(f"Error: adb failed: {stderr}", file=sys.stderr)
-        sys.exit(1)
-    return result.stdout
+from droidutils import run_adb
 
 
 def main():

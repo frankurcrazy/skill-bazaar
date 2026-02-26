@@ -21,6 +21,11 @@ python3 scripts/droid-observe.py --phone-state
 # Include layout containers (normally filtered out)
 python3 scripts/droid-observe.py --all
 
+# Control filtering (enabled by default):
+python3 scripts/droid-observe.py --no-filter-small      # include tiny elements (<5px)
+python3 scripts/droid-observe.py --no-filter-keyboard   # include keyboard elements
+python3 scripts/droid-observe.py --no-filter-invisible  # include off-screen elements
+
 # Multi-device: specify serial
 python3 scripts/droid-observe.py -s SERIAL
 ```

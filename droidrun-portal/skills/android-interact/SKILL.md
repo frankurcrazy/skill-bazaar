@@ -15,6 +15,11 @@ Helper scripts in `droidrun-portal/scripts/` simplify common operations. Use the
 # Tap element by text (finds it in a11y_tree, calculates center, taps)
 python3 scripts/droid-tap.py "Submit"
 python3 scripts/droid-tap.py "Submit" --exact    # exact text match only
+python3 scripts/droid-tap.py "Submit" --avoid-overlap  # find clear tap point
+
+# Tap element by index (faster, from droid-observe output)
+python3 scripts/droid-tap-index.py 5             # tap element [5]
+python3 scripts/droid-tap-index.py 5 --avoid-overlap  # avoid overlapping elements
 
 # Type text via ContentProvider (supports Unicode)
 python3 scripts/droid-type.py "Hello World"
