@@ -8,7 +8,7 @@
     {
       "name": "droidrun-portal",
       "description": "Control Android devices via droidrun-portal using ADB commands",
-      "version": "1.1.0",
+      "version": "1.2.0",
       "source": "./droidrun-portal"
     }
   ]
