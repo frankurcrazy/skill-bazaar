@@ -1,6 +1,9 @@
 {
   "name": "skills",
   "description": "Custom Claude Code skills and plugins",
+  "owner": {
+    "name": "Frank"
+  },
   "plugins": [
     {
       "name": "droidrun-portal",
