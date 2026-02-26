@@ -79,6 +79,7 @@ Optional Python scripts in `scripts/` simplify common operations:
 # Observe UI elements
 python3 scripts/droid-observe.py
 python3 scripts/droid-observe.py --phone-state
+python3 scripts/droid-observe.py --full --json  # Complete tree
 
 # Tap by text
 python3 scripts/droid-tap.py "Submit"
@@ -86,6 +87,11 @@ python3 scripts/droid-tap.py "Submit" --exact --avoid-overlap
 
 # Tap by index (faster)
 python3 scripts/droid-tap-index.py 5
+python3 scripts/droid-tap-index.py 5 --full  # Use with --full observe
+
+# Long-press
+python3 scripts/droid-longpress.py "Item"
+python3 scripts/droid-longpress-index.py 5 --duration 2000
 
 # Type text
 python3 scripts/droid-type.py "Hello World"
@@ -93,6 +99,11 @@ python3 scripts/droid-type.py "replacement" --clear
 
 # Wait for element
 python3 scripts/droid-wait.py "Loading" --timeout 30
+
+# Window overlays (bubbles, PiP) - not in accessibility tree
+python3 scripts/droid-windows.py           # List overlay windows
+python3 scripts/droid-windows.py --all     # List all visible windows
+python3 scripts/droid-tap-window.py "Bubbles"  # Tap window by name
 ```
 
 ### Script Features
@@ -154,8 +165,12 @@ droidrun-portal/
 │   ├── droid-observe.py   # Query UI elements
 │   ├── droid-tap.py       # Tap by text search
 │   ├── droid-tap-index.py # Tap by element index
+│   ├── droid-longpress.py # Long-press by text
+│   ├── droid-longpress-index.py # Long-press by index
 │   ├── droid-type.py      # Type text
-│   └── droid-wait.py      # Wait for element
+│   ├── droid-wait.py      # Wait for element
+│   ├── droid-windows.py   # List system overlay windows
+│   └── droid-tap-window.py # Tap overlay by window name
 ├── skills/                # Claude Code skill definitions
 │   ├── android-setup/     # Device setup skill
 │   ├── android-observe/   # Observation skill
