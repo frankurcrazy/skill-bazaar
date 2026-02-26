@@ -1,12 +1,12 @@
 {
-  "name": "droidrun-portal-marketplace",
-  "description": "Android device control skills using droidrun-portal",
+  "name": "skills",
+  "description": "Custom Claude Code skills and plugins",
   "plugins": [
     {
       "name": "droidrun-portal",
       "description": "Control Android devices via droidrun-portal using ADB commands",
       "version": "1.0.0",
-      "source": "./"
+      "source": "./droidrun-portal"
     }
   ]
 }
