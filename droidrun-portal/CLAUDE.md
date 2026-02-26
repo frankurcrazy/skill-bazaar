@@ -70,8 +70,13 @@ No automated tests yet. Manual testing:
 
 ## Maintenance Checklist
 
-When adding new skills or scripts, update these files:
+**When adding new skills or scripts, update these files:**
 
 - [ ] `README.md` — Add to "Available Skills" table and/or "Helper Scripts" section
 - [ ] `docs/plans/*-design.md` — Update architecture sections if structure changes
 - [ ] `CLAUDE.md` — Update if new APIs or conventions are introduced
+
+**Also update parent marketplace files:**
+
+- [ ] `../README.md` — Update skills list in plugin details section
+- [ ] `../.claude-plugin/marketplace.json` — Update version if releasing new version

@@ -93,6 +93,20 @@ When adding a plugin, update `.claude-plugin/marketplace.json`:
 - Keep plugin READMEs updated with installation and usage
 - Commit often, push when features are complete
 
+## Maintenance Checklist
+
+**IMPORTANT: When adding a new plugin or skill, you MUST update these files:**
+
+- [ ] `.claude-plugin/marketplace.json` — Add plugin entry to `plugins` array
+- [ ] `README.md` — Add row to "Available Plugins" table
+- [ ] `README.md` — Add section under "Plugin Details" with skills list
+
+**When modifying an existing plugin:**
+
+- [ ] Update version in `<plugin>/.claude-plugin/plugin.json`
+- [ ] Update version in `.claude-plugin/marketplace.json`
+- [ ] Update plugin's own `README.md` if features changed
+
 ## Installation (for users)
 
 ```bash
