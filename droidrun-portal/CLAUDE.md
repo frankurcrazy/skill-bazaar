@@ -67,3 +67,11 @@ No automated tests yet. Manual testing:
 1. Connect Android device with droidrun-portal installed
 2. Run `python3 scripts/droid-observe.py` to verify connection
 3. Test tap/type/wait scripts against a sample app
+
+## Maintenance Checklist
+
+When adding new skills or scripts, update these files:
+
+- [ ] `README.md` — Add to "Available Skills" table and/or "Helper Scripts" section
+- [ ] `docs/plans/*-design.md` — Update architecture sections if structure changes
+- [ ] `CLAUDE.md` — Update if new APIs or conventions are introduced
