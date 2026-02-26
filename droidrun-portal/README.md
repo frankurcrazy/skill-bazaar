@@ -19,21 +19,44 @@ A Claude Code skills plugin for controlling Android devices via [droidrun-portal
 
 ### Install as Claude Code Plugin
 
+**Option 1: Add as a marketplace (recommended for Git repos)**
+
 ```bash
-# Navigate to your Claude Code plugins directory
-cd ~/.claude/plugins
+# Add this repository as a marketplace
+/plugin marketplace add https://github.com/user/skills.git
 
-# Clone or symlink this repository
-git clone <repo-url> droidrun-portal
-# Or symlink if developing locally:
-ln -s /path/to/skills/droidrun-portal droidrun-portal
+# Then install the plugin
+/plugin install droidrun-portal@skills
+```
 
-# Restart Claude Code to load the plugin
+**Option 2: Add as a local marketplace (for local development)**
+
+```bash
+# Add the local directory as a marketplace
+/plugin marketplace add /path/to/skills
+
+# Then install the plugin
+/plugin install droidrun-portal@skills --scope local
+```
+
+**Option 3: Interactive installation**
+
+```bash
+# Open the plugin manager
+/plugin
+
+# Navigate to Marketplaces tab → Add your marketplace
+# Then go to Discover tab → Find and install droidrun-portal
 ```
 
 ### Verify Installation
 
-In Claude Code, the skills should now be available:
+After installation, the skills should be available. Test with:
+```bash
+/plugin  # Go to "Installed" tab to verify
+```
+
+Available skills:
 - `android-setup` — Device connection and portal installation
 - `android-observe` — Read UI elements and device state
 - `android-interact` — Tap, swipe, type, and navigate
