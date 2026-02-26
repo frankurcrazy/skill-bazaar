@@ -1,6 +1,6 @@
 # droidrun-portal
 
-A Claude Code skills plugin for controlling Android devices via [droidrun-portal](https://github.com/AdbAutoPlayer/droidrun-portal)'s ADB ContentProvider interface.
+A Claude Code skills plugin for controlling Android devices via [droidrun-portal](https://github.com/droidrun/droidrun-portal)'s ADB ContentProvider interface.
 
 ## Features
 
