@@ -1,8 +1,8 @@
-# Claude Code Configuration for Skills Marketplace
+# Claude Code Configuration for Skill Bazaar
 
 ## Project Overview
 
-This is a Claude Code plugin marketplace containing custom skills and plugins.
+This is the Skill Bazaar — a marketplace of skills and plugins.
 
 ## Project Structure
 
@@ -110,6 +110,6 @@ When adding a plugin, update `.claude-plugin/marketplace.json`:
 ## Installation (for users)
 
 ```bash
-/plugin marketplace add /path/to/skills
-/plugin install <plugin-name>@skills
+/plugin marketplace add https://github.com/frankurcrazy/skill-bazaar.git
+/plugin install <plugin-name>@skill-bazaar
 ```

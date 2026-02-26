@@ -1,6 +1,6 @@
-# Skills Marketplace
+# Skill Bazaar
 
-A collection of custom Claude Code plugins and skills.
+A marketplace of skills and plugins.
 
 ## Installation
 
@@ -8,10 +8,10 @@ A collection of custom Claude Code plugins and skills.
 
 ```bash
 # From a local path
-/plugin marketplace add /path/to/skills
+/plugin marketplace add /path/to/skill-bazaar
 
 # From a Git repository
-/plugin marketplace add https://github.com/user/skills.git
+/plugin marketplace add https://github.com/frankurcrazy/skill-bazaar.git
 ```
 
 ### Install a plugin
@@ -22,7 +22,7 @@ A collection of custom Claude Code plugins and skills.
 # Navigate to Discover tab → Select plugin → Install
 
 # Command line
-/plugin install <plugin-name>@skills
+/plugin install <plugin-name>@skill-bazaar
 ```
 
 ## Available Plugins
