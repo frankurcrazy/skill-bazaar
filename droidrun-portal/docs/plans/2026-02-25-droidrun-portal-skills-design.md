@@ -20,6 +20,13 @@ droidrun-portal/
 ├── .claude-plugin/
 │   ├── plugin.json
 │   └── marketplace.json
+├── scripts/
+│   ├── droidutils.py        # Shared utilities module
+│   ├── droid-observe.py     # Query UI elements
+│   ├── droid-tap.py         # Tap by text search
+│   ├── droid-tap-index.py   # Tap by element index
+│   ├── droid-type.py        # Type text
+│   └── droid-wait.py        # Wait for element
 ├── skills/
 │   ├── android-setup/
 │   │   └── SKILL.md
@@ -131,3 +138,43 @@ droidrun-portal/
 | Backspace | 67 |
 | Tab | 61 |
 | Escape | 111 |
+
+## Helper Scripts Architecture
+
+The `scripts/` directory contains Python helper scripts that simplify common operations. These are optional — all functionality is also available via raw ADB commands.
+
+### Shared Utilities Module (`droidutils.py`)
+
+Consolidates common functionality with improvements learned from the droidrun library:
+
+| Feature | Function | Description |
+|---------|----------|-------------|
+| **ADB execution** | `run_adb()` | Run ADB commands with error handling |
+| **Response parsing** | `parse_content_provider()` | Parse ContentProvider JSON responses |
+| **Retry logic** | `query_tree_with_retry()` | Retry failed queries (3 attempts, 0.5s delay) |
+| **Index lookup** | `build_index()`, `find_element_by_index()` | O(1) element lookup by index |
+| **Text search** | `find_element()` | Recursive tree search by text |
+| **Filtering** | `should_filter()` | Combines all filter checks |
+| **Size filtering** | `is_too_small()` | Filter elements < 5px |
+| **Visibility filtering** | `is_visible()` | Filter elements < 10% visible |
+| **Keyboard filtering** | `is_keyboard_element()` | Filter Google/Samsung keyboard elements |
+| **Clear point detection** | `find_clear_point()`, `get_tap_point()` | Quadrant subdivision to avoid overlaps |
+| **Formatting** | `format_element()` | Format element for display |
+
+### Script Reference
+
+| Script | Purpose | Key Options |
+|--------|---------|-------------|
+| `droid-observe.py` | List UI elements | `--phone-state`, `--all`, `--no-filter-*` |
+| `droid-tap.py` | Tap by text | `--exact`, `--avoid-overlap` |
+| `droid-tap-index.py` | Tap by index | `--avoid-overlap` |
+| `droid-type.py` | Type text | `--clear` |
+| `droid-wait.py` | Wait for element | `--timeout`, `--exact` |
+
+### Efficiency Improvements from droidrun
+
+1. **Index-based lookup**: O(1) element access via `build_index()` dict instead of O(N) recursive search
+2. **Smart filtering**: Reduces element count by 30-50% via size/visibility/keyboard filters
+3. **Retry logic**: Handles flaky ADB connections with configurable retries
+4. **Clear point detection**: Quadrant subdivision algorithm finds unblocked tap points for overlapping elements
+5. **Shared utilities**: Single module eliminates code duplication across scripts
